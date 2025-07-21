@@ -158,6 +158,7 @@ CREATE TABLE IF NOT EXISTS `utenti` (
   `password_hash` varchar(255) NOT NULL,
   `ruolo` varchar(20) NOT NULL DEFAULT 'user',
   `gruppo_lavoro` varchar(50) DEFAULT NULL,
+  `gruppo_app` varchar(50) NOT NULL DEFAULT 'Gruppo Vitolo',
   `data_creazione` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_username` (`username`),
@@ -165,9 +166,9 @@ CREATE TABLE IF NOT EXISTS `utenti` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- Dump dei dati della tabella gruppo_vitolo_db.utenti: ~2 rows (circa)
-INSERT INTO `utenti` (`id`, `username`, `email`, `nome`, `password_hash`, `ruolo`, `gruppo_lavoro`, `data_creazione`) VALUES
-        (1, 'admin', 'admin@gruppovitolo.example.com', 'admin', '$2y$10$9RMP49bT0CRS9I.MXuIa7ek2SHfovBVWezAMjYvXTyz5oq.2EV3NO', 'admin', 'Amministrazione', '2025-06-06 07:36:44'),
-        (2, 'users', '', 'users', '$2y$10$jCb4tU2C6hc99e4gFJUCTePCTwJhtK7BuK1lF046bJrscFDw4ikVi', 'user', 'Amministrazione', '2025-06-06 07:36:44');
+INSERT INTO `utenti` (`id`, `username`, `email`, `nome`, `password_hash`, `ruolo`, `gruppo_lavoro`, `gruppo_app`, `data_creazione`) VALUES
+        (1, 'admin', 'admin@gruppovitolo.example.com', 'admin', '$2y$10$9RMP49bT0CRS9I.MXuIa7ek2SHfovBVWezAMjYvXTyz5oq.2EV3NO', 'admin', 'Amministrazione', 'CCSUD', '2025-06-06 07:36:44'),
+        (2, 'users', '', 'users', '$2y$10$jCb4tU2C6hc99e4gFJUCTePCTwJhtK7BuK1lF046bJrscFDw4ikVi', 'user', 'Amministrazione', 'Gruppo Vitolo', '2025-06-06 07:36:44');
 
 -- ------------------------------------------------------------------
 -- Tabella categorie_prodotti: raggruppa i prodotti per categoria

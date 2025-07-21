@@ -1,8 +1,10 @@
 <?php
 session_start();
 
+// Se l'utente ha già effettuato l'accesso lo reindirizziamo direttamente
+// alla pagina di selezione delle applicazioni
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-    header("Location: dashboard.php");
+    header("Location: app_list.php");
     exit;
 }
 
@@ -29,7 +31,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         error_log("[Login con ruoli] Errore di connessione al database: " . $conn->connect_error);
         $login_error = "Errore di sistema. Riprova più tardi.";
     } else {
-        $stmt = $conn->prepare("SELECT id, username, password_hash, ruolo, nome FROM utenti WHERE username = ?");
+        // Recupera anche i gruppi associati all'utente per determinare quali app mostrare
+        $stmt = $conn->prepare("SELECT id, username, password_hash, ruolo, nome, gruppo_lavoro, gruppo_app FROM utenti WHERE username = ?");
         if ($stmt) {
             $stmt->bind_param("s", $username_input);
             if (!$stmt->execute()) {
@@ -37,7 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             } else {
                 $stmt->store_result();
                 if ($stmt->num_rows > 0) {
-                    $stmt->bind_result($user_id, $db_username, $hashed_password_from_db, $db_ruolo, $db_user_fullname);
+                    // Oltre alle informazioni principali otteniamo anche i gruppi associati
+                    $stmt->bind_result($user_id, $db_username, $hashed_password_from_db, $db_ruolo, $db_user_fullname, $db_gruppo_lavoro, $db_gruppo_app);
                     $stmt->fetch();
                     if (password_verify($password_input, $hashed_password_from_db)) {
                         session_regenerate_id(true);
@@ -45,8 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
                         $_SESSION['user_id'] = $user_id;
                         $_SESSION['username'] = $db_username;
                         $_SESSION['ruolo'] = $db_ruolo;
+                        $_SESSION['gruppo_lavoro'] = $db_gruppo_lavoro;
+                        $_SESSION['gruppo_app'] = $db_gruppo_app;
                         $_SESSION['user_fullname'] = $db_user_fullname;
-                        header("Location: dashboard.php");
+                        header("Location: app_list.php");
                         exit;
                     } else {
                         $login_error = "Nome utente o password non validi.";
