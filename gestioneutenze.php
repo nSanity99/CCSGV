@@ -90,7 +90,7 @@ if ($conn_gu->connect_error) {
 
 
     // 2. Query per ottenere gli utenti della pagina corrente
-    $sql_users = "SELECT id, username, email, nome, ruolo, gruppo_lavoro, data_creazione FROM utenti $sql_where ORDER BY username ASC LIMIT ? OFFSET ?";
+    $sql_users = "SELECT id, username, email, nome, ruolo, gruppo_lavoro, gruppo_app, data_creazione FROM utenti $sql_where ORDER BY username ASC LIMIT ? OFFSET ?";
     $stmt_users = $conn_gu->prepare($sql_users);
 
     if ($stmt_users) {
@@ -123,7 +123,7 @@ if ($conn_gu->connect_error) {
 
     if ($action === 'edit' && isset($_GET['id'])) {
         $user_id_to_edit = intval($_GET['id']);
-        $stmt_edit = $conn_gu->prepare("SELECT id, username, email, nome, ruolo, gruppo_lavoro FROM utenti WHERE id = ?");
+        $stmt_edit = $conn_gu->prepare("SELECT id, username, email, nome, ruolo, gruppo_lavoro, gruppo_app FROM utenti WHERE id = ?");
         if ($stmt_edit) {
             $stmt_edit->bind_param("i", $user_id_to_edit);
             $stmt_edit->execute();
@@ -274,7 +274,7 @@ if ($action === 'list_feedback' || strpos($action, 'user_') === 0) { // user_cre
                 <table class="users-table">
                     <thead>
                         <tr>
-                            <th>ID</th><th>Username</th><th>Email</th><th>Nome</th><th>Ruolo</th><th>Gruppo</th><th>Data Creazione</th><th>Azioni</th>
+                            <th>ID</th><th>Username</th><th>Email</th><th>Nome</th><th>Ruolo</th><th>Gruppo</th><th>Gruppo App</th><th>Data Creazione</th><th>Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -287,6 +287,7 @@ if ($action === 'list_feedback' || strpos($action, 'user_') === 0) { // user_cre
                                     <td><?php echo htmlspecialchars($user['nome'] ?? '-'); ?></td>
                                     <td><?php echo htmlspecialchars($user['ruolo']); ?></td>
                                     <td><?php echo htmlspecialchars($user['gruppo_lavoro'] ?? '-'); ?></td>
+                                    <td><?php echo htmlspecialchars($user['gruppo_app'] ?? '-'); ?></td>
                                     <td><?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($user['data_creazione']))); ?></td>
                                     <td class="actions-cell" style="white-space: nowrap;">
                                         <a href="gestioneutenze.php?action=edit&id=<?php echo $user['id']; ?>#user-form-anchor" class="admin-button modifica-btn">Modifica</a>
@@ -301,7 +302,7 @@ if ($action === 'list_feedback' || strpos($action, 'user_') === 0) { // user_cre
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr><td colspan="8" style="text-align:center; padding: 20px;">
+                            <tr><td colspan="9" style="text-align:center; padding: 20px;">
                                 <?php echo !empty($search_term) ? 'Nessun utente trovato per i criteri di ricerca.' : 'Nessun utente trovato nel sistema.'; ?>
                             </td></tr>
                         <?php endif; ?>
@@ -368,6 +369,13 @@ if ($action === 'list_feedback' || strpos($action, 'user_') === 0) { // user_cre
                                 <?php foreach ($gruppi_lavoro as $gruppo): ?>
                                     <option value="<?php echo htmlspecialchars($gruppo); ?>" <?php echo (isset($user_to_edit['gruppo_lavoro']) && $user_to_edit['gruppo_lavoro'] === $gruppo) ? 'selected' : ''; ?>><?php echo htmlspecialchars($gruppo); ?></option>
                                 <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="gruppo_app">Gruppo App:</label>
+                            <select id="gruppo_app" name="gruppo_app" class="form-control" required>
+                                <option value="Gruppo Vitolo" <?php echo (isset($user_to_edit['gruppo_app']) && $user_to_edit['gruppo_app'] === 'Gruppo Vitolo') ? 'selected' : ''; ?>>Gruppo Vitolo</option>
+                                <option value="CCSUD" <?php echo (isset($user_to_edit['gruppo_app']) && $user_to_edit['gruppo_app'] === 'CCSUD') ? 'selected' : ''; ?>>CCSUD</option>
                             </select>
                         </div>
                         <button type="submit" class="admin-button"><?php echo $action === 'create_user' ? 'Crea Utente' : 'Salva Modifiche'; ?></button>
